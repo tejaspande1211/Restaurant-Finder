@@ -1,15 +1,32 @@
+package com.example.restaurant.entity;
+
+import com.example.restaurant.exception.ItemNotFoundException;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-public class Restaurant {
+@Entity
+@Table(name = "restaurant")
+@NoArgsConstructor
+public class Restaurant implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String location;
+    @Column(name = "opening_time")
     public LocalTime openingTime;
+    @Column(name = "closing_time")
     public LocalTime closingTime;
-    private List<Item> menu = new ArrayList<Item>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> menu = new ArrayList<>();
 
     public Restaurant(String name, String location, LocalTime openingTime, LocalTime closingTime) {
         this.name = name;
@@ -42,16 +59,16 @@ public class Restaurant {
         menu.add(newItem);
     }
     
-    public void removeFromMenu(String itemName) throws itemNotFoundException {
+    public void removeFromMenu(String itemName) throws ItemNotFoundException {
 
         Item itemToBeRemoved = findItemByName(itemName);
         if (itemToBeRemoved == null)
-            throw new itemNotFoundException(itemName);
+            throw new ItemNotFoundException(itemName);
 
         menu.remove(itemToBeRemoved);
     }
     public void displayDetails(){
-        System.out.println("Restaurant:"+ name + "\n"
+        System.out.println("com.example.restaurant.entity.Restaurant:"+ name + "\n"
                 +"Location:"+ location + "\n"
                 +"Opening time:"+ openingTime +"\n"
                 +"Closing time:"+ closingTime +"\n"
